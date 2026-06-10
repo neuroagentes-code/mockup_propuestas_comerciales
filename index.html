@@ -31,20 +31,19 @@
   </header>
   <main>
     <p class="intro">Selecciona un cliente para abrir su Tablero de Validacion.</p>
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid"><div class="vacio">Cargando clientes...</div></div>
   </main>
   <footer>Mockups de demostracion - datos ilustrativos - (c) NeuroAgentes</footer>
 
   <script>
-    // La lista la inyecta publicar_sitio.py (autocontenido: funciona por doble clic y online).
-    // No edites este HTML: agrega clientes con el script o editando clientes.json y re-corriendo --rebuild.
-    var LISTA = [{"nombre": "Somos Circular", "desc": "Gestion de residuos - economia circular. 6 agentes, 23 funciones (piloto Ara).", "carpeta": "somos-circular"}];
-    (function(){
+    // HIBRIDO: online lee clientes.json (siempre actual); por doble clic usa esta copia de respaldo.
+    var EMBED = [{"nombre": "Somos Circular", "desc": "Gestion de residuos - economia circular. 6 agentes, 23 funciones (piloto Ara).", "carpeta": "somos-circular"}, {"nombre": "Parzero", "desc": "Proyecto de normatividad ambiental.", "carpeta": "parzero"}];
+    function pinta(lista){
       var grid = document.getElementById('grid');
-      if(!Array.isArray(LISTA) || LISTA.length === 0){
-        grid.innerHTML = '<div class="vacio">Aun no hay clientes. Agrega uno con publicar_sitio.py.</div>'; return;
+      if(!Array.isArray(lista) || lista.length === 0){
+        grid.innerHTML = '<div class="vacio">Aun no hay clientes en clientes.json.</div>'; return;
       }
-      grid.innerHTML = LISTA.map(function(c){
+      grid.innerHTML = lista.map(function(c){
         var carpeta = String(c.carpeta || '').replace(/[^a-z0-9\-_]/gi,'');
         return '<a class="card" href="./' + carpeta + '/">' +
                  '<h2>' + (c.nombre || carpeta) + '</h2>' +
@@ -52,7 +51,11 @@
                  '<span class="go">Abrir tablero -></span>' +
                '</a>';
       }).join('');
-    })();
+    }
+    fetch('./clientes.json?v=' + Date.now())
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(l){ pinta(Array.isArray(l) && l.length ? l : EMBED); })
+      .catch(function(){ pinta(EMBED); });   // file:// (doble clic) o sin clientes.json -> respaldo
   </script>
 </body>
 </html>
