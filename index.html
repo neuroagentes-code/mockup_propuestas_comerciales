@@ -1,13 +1,63 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Propuestas · NeuroAgentes</title>
-<style>body{font-family:Montserrat,system-ui,sans-serif;background:#0E1F1C;color:#fff;
-margin:0;display:grid;place-items:center;min-height:100vh}
-.box{background:#16302a;border-radius:16px;padding:34px 40px;max-width:560px;width:90%}
-h1{color:#00FF7A;margin:0 0 6px;font-size:22px}p{color:#9fb3aa;margin:0 0 18px;font-size:13px}
-ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-a{display:block;background:#0E1F1C;border:1px solid rgba(255,255,255,.1);border-radius:10px;
-padding:12px 16px;color:#fff;text-decoration:none;font-weight:600;font-size:14px}
-a:hover{border-color:#00FF7A;color:#00FF7A}</style></head>
-<body><div class="box"><h1>NeuroAgentes</h1><p>Propuestas y demos interactivas.</p>
-<ul><li><a href="./somos-circular/">Somos Circular</a></li></ul></div></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroAgentes — Tableros de clientes</title>
+<style>
+  :root{ --verde:#00FF7A; --chrome:#0E1F1C; --texto-verde:#0D3326; --fondo:#F5F5F5; --gris:#58585E; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--fondo);color:#1b1b1f}
+  header{background:var(--chrome);color:#fff;padding:22px 28px;display:flex;align-items:center;gap:14px}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--verde);display:grid;place-items:center;color:var(--texto-verde);font-weight:800}
+  header h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+  header span{opacity:.7;font-size:13px;margin-left:6px}
+  main{max-width:980px;margin:0 auto;padding:36px 24px}
+  .intro{color:var(--gris);margin:0 0 24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+  a.card{display:block;text-decoration:none;background:#fff;border:1px solid #e7e7ea;border-radius:16px;padding:22px;transition:.15s;color:inherit}
+  a.card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.08);border-color:var(--verde)}
+  .card h2{margin:0 0 6px;font-size:17px}
+  .card p{margin:0;color:var(--gris);font-size:13px}
+  .card .go{margin-top:14px;display:inline-block;font-size:13px;font-weight:700;color:var(--texto-verde);background:var(--verde);padding:7px 12px;border-radius:9px}
+  .vacio{color:var(--gris);background:#fff;border:1px dashed #cfcfd4;border-radius:16px;padding:22px}
+  footer{max-width:980px;margin:0 auto;padding:8px 24px 40px;color:#9a9aa0;font-size:12px}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">N</div>
+    <h1>NeuroAgentes — Tableros de Validacion <span>Automatiza, evoluciona, conecta</span></h1>
+  </header>
+  <main>
+    <p class="intro">Selecciona un cliente para abrir su Tablero de Validacion.</p>
+    <div class="grid" id="grid"><div class="vacio">Cargando clientes...</div></div>
+  </main>
+  <footer>Mockups de demostracion - datos ilustrativos - (c) NeuroAgentes</footer>
+
+  <script>
+    // El menu se arma SOLO desde clientes.json. No edites este HTML:
+    // para agregar un cliente, edita clientes.json y sube su carpeta.
+    fetch('./clientes.json?v=' + Date.now())
+      .then(function(r){ if(!r.ok) throw new Error('no clientes.json'); return r.json(); })
+      .then(function(lista){
+        var grid = document.getElementById('grid');
+        if(!Array.isArray(lista) || lista.length === 0){
+          grid.innerHTML = '<div class="vacio">Aun no hay clientes en clientes.json.</div>'; return;
+        }
+        grid.innerHTML = lista.map(function(c){
+          var carpeta = String(c.carpeta || '').replace(/[^a-z0-9\-_]/gi,'');
+          return '<a class="card" href="./' + carpeta + '/">' +
+                   '<h2>' + (c.nombre || carpeta) + '</h2>' +
+                   '<p>' + (c.desc || '') + '</p>' +
+                   '<span class="go">Abrir tablero -></span>' +
+                 '</a>';
+        }).join('');
+      })
+      .catch(function(){
+        document.getElementById('grid').innerHTML =
+          '<div class="vacio">No se pudo leer clientes.json. Verifica que este junto a este index.html.</div>';
+      });
+  </script>
+</body>
+</html>
